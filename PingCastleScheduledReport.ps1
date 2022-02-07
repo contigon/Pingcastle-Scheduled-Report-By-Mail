@@ -95,7 +95,7 @@ function sendReportByMail {
         Start-Process "https://security.google.com/settings/security/apppasswords"
         Write-Host "https://security.google.com/settings/security/apppasswords" -ForegroundColor Yellow
         Write-Host "(eg. user name = donald@trump.com)"  -ForegroundColor Yellow
-        Write-Host "(eg. password = jdynzpsxmjepwxnn)"  -ForegroundColor Yellow
+        Write-Host "(eg. password = jdynfpsxmtepwxnn)"  -ForegroundColor Yellow
         $credStore = Get-Credential
         $credStore | Export-CliXml "$PSScriptRoot\email-creds.clixml"
         Write-Host "[OK] email credentials were saved to [$PSScriptRoot\email-creds.clixml] file" -ForegroundColor Green

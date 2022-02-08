@@ -14,17 +14,24 @@
 .RELEASENOTES
 Version 1.0: Original published version.
 
-.VERSION 0.2
+.VERSION 2.0
 .GUID dcf37da6-cd01-43c7-8e51-a5ce735aab42
 .AUTHOR Omer Friedman
-.COMPANYNAME Israel National Cyber Directorate
+.COMPANYNAME INCD
 .TAGS pingcastle security activedirectory
 .PROJECTURI 
 .EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
-Version 0.2: Updates
+Version 2.0: Rewrite part of the code 
+             Addded features such as:
+             Downloading latest PingCastle release
+             Sending report by mail using gmail
+             Score is presented in colours
+             Running PingCastle from a non-domain joined computer
+             Adding options to add schedule
+
 
 #>
 
@@ -46,15 +53,43 @@ Version 0.2: Updates
     ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .DESCRIPTION
-    Execute PingCastle for generate report
-    Compares values to the previous report
+    Downloads the latest version PingCastle 
+    Update PingCastle if needed
+    Execute PingCastle in order to generate a domain health report
+    Compare values with previous report
     Moves reports to a directory
-    Update PingCastle
+    Sends the HTML report using Gmail
+    
 .EXAMPLE
-    PS C:\> Send-PingCastleReport.ps1
+    PS C:\> PingCastleScheduledReport.ps1
 #>
 
 CLS
+
+Start-Transcript -Path "$PSScriptRoot\PingCastleSceduledReport.log" -NoClobber -Append
+
+function SchedulePingCastleTask {
+
+ Write-Host "[Note] Creating a task that will run on a Daily basis at 08am (You can change that manually from Task Scheduler) "
+ $PingCastleTask = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-file $PSScriptRoot\PingCastleScheduledReport.ps1"
+ $PingCastleTaskTrigger = New-ScheduledTaskTrigger -Daily -At 08:00:00
+ Register-ScheduledTask -TaskName "PingCastleTask" -Action $PingCastleTask -Trigger $PingCastleTaskTrigger -Description "run ping castle report" -RunLevel Highest
+
+}
+
+if ((Get-ScheduledTask -TaskName "PingCastle*").State -ilike "") 
+{
+    $ScheduledTask = Read-Host "Press [T] to add a scheduled report by e-mail task (or Enter to continue without schedule)"
+    if ($ScheduledTask -cmatch "T") 
+    {
+        
+        SchedulePingCastleTask
+    }
+} 
+else
+{
+    Write-Host "[OK] PingCastle scheduled task status is:" (Get-ScheduledTask -TaskName "PingCastle*").State -ForegroundColor Green
+}
 
 function DownloadFromGithub {
     
@@ -83,19 +118,22 @@ function DownloadFromGithub {
         Expand-Archive -Path "$pathExtract\$appName.zip" -DestinationPath $pathExtract -Force
     } else {
         Write-Host "[Failed] You are not connected to the internet, Please download and extract PingCastle to $pingCastleFullpath" -ForegroundColor Red
+        Stop-Transcript
         break
     }
 }
 
+
 function sendReportByMail {
-    param([string]$Attachment)
+
+    param([string]$Attachment,[string]$Body)
     if (!(Test-Path "$PSScriptRoot\email-creds.clixml"))
     {      
         Write-Host "[Note] In order to send email using Gmail you need to generate a gmail windows desktop application password using this link:" -ForegroundColor Yellow
         Start-Process "https://security.google.com/settings/security/apppasswords"
         Write-Host "https://security.google.com/settings/security/apppasswords" -ForegroundColor Yellow
         Write-Host "(eg. user name = donald@trump.com)"  -ForegroundColor Yellow
-        Write-Host "(eg. password = jdynfpsxmtepwxnn)"  -ForegroundColor Yellow
+        Write-Host "(eg. password = jdynzpsxmjepwxnn)"  -ForegroundColor Yellow
         $credStore = Get-Credential
         $credStore | Export-CliXml "$PSScriptRoot\email-creds.clixml"
         Write-Host "[OK] email credentials were saved to [$PSScriptRoot\email-creds.clixml] file" -ForegroundColor Green
@@ -117,7 +155,6 @@ function sendReportByMail {
     $Cc = $emailConf.Cc
     $sentDate = Get-Date
     $Subject = "PingCastle Report $sentDate"
-    $Body = "This is your PingCastle report"
     $SMTPServer = "smtp.gmail.com"
     $SMTPPort = "587"
     Send-MailMessage -From $mailUser -to $To -Cc $Cc -Subject $Subject `
@@ -202,6 +239,8 @@ if ((gwmi win32_computersystem).partofdomain -eq $true) {
     $Global:ProgressPreference = 'SilentlyContinue'
     if (!((Test-NetConnection labdc -WarningAction SilentlyContinue).PingSucceeded)){
         Write-Host "[Failed] Could not ping the domain server [$domainServer], please run the script again" -ForegroundColor Red
+
+        Stop-Transcript
         break
     } else {
         Write-Host "[OK] Succeded pinging the domain server [$domainServer]" -ForegroundColor Green
@@ -296,7 +335,7 @@ catch {
 
 # Check if PingCastle previous score file exist
 if (-not (Test-Path $pingCastleScoreFileFullpath)) {
-    # if don't exist, sent report
+    # if don't exist, send report
     $sentNotification = $true
 }
 else {
@@ -320,7 +359,9 @@ else {
 if ($sentNotification -eq $false) {
     Remove-Item ("{0}.{1}" -f (Join-Path $PingCastle.ProgramPath $PingCastle.ReportFileName), '*')
     Write-Host "[OK] Score is the same as the previous run, New report deleted from disk" -ForegroundColor Green
+    sendReportByMail $pingCastleScoreFileFullpath "Score is the same as the previous run"
     Pop-Location
+    Stop-Transcript
     exit
 }
 
@@ -379,7 +420,7 @@ Catch {
     Write-Host "[Failed] Error updating report score file $pingCastleScoreFileFullpath" -ForegroundColor Red
 }
 
-sendReportByMail $pingCastleReportFullpath
+sendReportByMail $pingCastleReportFullpath "PingCastle full report"
 
 # Move report to logs directory
 try {
@@ -392,3 +433,4 @@ catch {
 }
 
 Pop-Location
+Stop-Transcript

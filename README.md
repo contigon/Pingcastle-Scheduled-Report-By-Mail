@@ -1,5 +1,7 @@
 # Pingcastle-Scheduled-Report-By-Mail
-Running PingCastle tool for Active Directory Health audit and sending report by mail
+
+Powershell script to automate running PingCastle tool for Active Directory Health audit and sending report by mail
+also comparing the scoring results with last run to check if there was a change in scoring.
 
 Features:
 1. Automatically sownloads the latest version PingCastle
@@ -9,7 +11,7 @@ Features:
 5. Sends the HTML report using Gmail
 6. Option to run as a scheduled task
 
-Note: If you read you mail i a browser, you need tp download the HTML report to a directory so it will open correctly
+Note: If you read your e-mails in a browser, you need tp download the HTML report to a directory so it will open correctly
 
 
 

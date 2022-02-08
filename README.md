@@ -2,9 +2,10 @@
 Running PingCastle tool for Active Directory Health audit and sending report by mail
 
 New features:
-    Downloads the latest version PingCastle 
-    Update PingCastle if needed
-    Execute PingCastle in order to generate a domain health report
-    Compare values with previous report
-    Moves reports to a directory
-    Sends the HTML report using Gmail
+1. Downloads the latest version PingCastle
+2. Update PingCastle if needed
+3. Execute PingCastle in order to generate a domain health report
+4. Compare values with previous report
+5. Moves reports to a directory
+6. Sends the HTML report using Gmail
+7. Option to run as a scheduled task

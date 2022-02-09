@@ -3,6 +3,8 @@
 Powershell script to automate running PingCastle tool for Active Directory Health audit and sending report by mail
 also comparing the scoring results with last run to check if there was a change in scoring.
 
+![image](https://user-images.githubusercontent.com/6965771/153182886-7739fc9e-3bb5-4c59-98d3-53a59c1f2d1a.png)
+
 Features:
 1. Automatically sownloads the latest version PingCastle
 2. Updates PingCastle to newer versions if exists

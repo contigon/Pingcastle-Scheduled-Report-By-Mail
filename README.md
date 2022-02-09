@@ -8,7 +8,7 @@ also comparing the scoring results with last run to check if there was a change 
 Features:
 1. Automatically sownloads the latest version PingCastle
 2. Updates PingCastle to newer versions if exists
-3. Execute PingCastle in order to generate a domain health report
+3. Execute PingCastle full audit in order to generate a domain health report
 4. Compare values with previous report
 5. Sends the HTML report using Gmail
 6. Option to run as a scheduled task
@@ -24,4 +24,6 @@ https://myaccount.google.com/apppasswords
 
 Note: Tested on windows 10 Powershell 5.1
 
-
+Credits:
+https://www.pingcastle.com/
+https://gist.github.com/aikiox/98f97ccc092557acc1ea958d65f8f361

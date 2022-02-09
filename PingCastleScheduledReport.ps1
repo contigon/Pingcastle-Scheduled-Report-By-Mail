@@ -66,6 +66,17 @@ Version 2.0: Rewrite part of the code
 
 CLS
 
+$logo = @"
+
+ __         __              __                         __                
+|__)o _  _ /   _  _|_| _   (_  _ |_  _  _|   | _  _|  |__) _  _  _  _|_ _
+|   || )(_)\__(_|_)|_|(-`  __)(_ | )(-`(_||_||(-`(_|  | \ (-`|_)(_)| |__)
+        _/                                                   |           
+
+"@
+
+Write-Host $logo -ForegroundColor DarkYellow
+
 Start-Transcript -Path "$PSScriptRoot\PingCastleSceduledReport.log" -NoClobber -Append
 
 function SchedulePingCastleTask {
@@ -132,8 +143,8 @@ function sendReportByMail {
         Write-Host "[Note] In order to send email using Gmail you need to generate a gmail windows desktop application password using this link:" -ForegroundColor Yellow
         Start-Process "https://security.google.com/settings/security/apppasswords"
         Write-Host "https://security.google.com/settings/security/apppasswords" -ForegroundColor Yellow
-        Write-Host "(eg. user name = donald@trump.com)"  -ForegroundColor Yellow
-        Write-Host "(eg. password = jdynzpsxmjepwxnn)"  -ForegroundColor Yellow
+        Write-Host "(eg. user name = silentbob@gmail.com)"  -ForegroundColor Yellow
+        Write-Host "(eg. password = xdynzpsxmjepwxnn)"  -ForegroundColor Yellow
         $credStore = Get-Credential
         $credStore | Export-CliXml "$PSScriptRoot\email-creds.clixml"
         Write-Host "[OK] email credentials were saved to [$PSScriptRoot\email-creds.clixml] file" -ForegroundColor Green
@@ -145,7 +156,7 @@ function sendReportByMail {
     if (!(Test-Path "$PSScriptRoot\email-conf.clixml"))
     {   
        @{
-        To = Read-Host "Input main email address you want the report to be sent"
+        To = Read-Host "Input a primary email address you want the report to be sent"
         Cc = Read-Host "Input a cc email address you want the report to be sent"
         } | Export-CliXml "$PSScriptRoot\email-conf.clixml"
     }
@@ -185,7 +196,7 @@ if ((gwmi win32_computersystem).partofdomain -eq $true) {
         Name            = $ApplicationName
         ProgramPath     = Join-Path $PSScriptRoot $ApplicationName
         ProgramName     = '{0}.exe' -f $ApplicationName
-        Arguments       = "--healthcheck --level Full"
+        Arguments       = "--healthcheck --level Full --log-console"
         ReportFileName  = 'ad_hc_{0}' -f ($DomainDNS).ToLower()
         ReportFolder    = "Reports"
         ScoreFileName   = '{0}Score.txt' -f $ApplicationName
@@ -227,7 +238,7 @@ if ((gwmi win32_computersystem).partofdomain -eq $true) {
         Name            = $ApplicationName
         ProgramPath     = Join-Path $PSScriptRoot $ApplicationName
         ProgramName     = '{0}.exe' -f $ApplicationName
-        Arguments       = "--server $domainServer --user $domainUser --password $userPassword --healthcheck --level Full"
+        Arguments       = "--server $domainServer --user $domainUser --password $userPassword --healthcheck --level Full --log-console"
         ReportFileName  = 'ad_hc_{0}' -f ($DomainDNS).ToLower()
         ReportFolder    = "Reports"
         ScoreFileName   = '{0}Score.txt' -f $ApplicationName

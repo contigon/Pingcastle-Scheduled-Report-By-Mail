@@ -6,12 +6,12 @@ also comparing the scoring results with last run to check if there was a change 
 ![image](https://user-images.githubusercontent.com/6965771/153182886-7739fc9e-3bb5-4c59-98d3-53a59c1f2d1a.png)
 
 Features:
-1. Automatically sownloads the latest version PingCastle
-2. Updates PingCastle to newer versions if exists
-3. Execute PingCastle full audit in order to generate a domain health report
+1. Automatically downloads latest PingCastle version 
+2. Updates PingCastle to newer versions (if already exists)
+3. Executes PingCastle full audit in order to generate a domain health report
 4. Compare values with previous report
-5. Sends the HTML report using Gmail
-6. Option to run as a scheduled task
+5. Sends the Ad health HTML report using Gmail SMTP service (needs to generate an application token 1st)
+6. Option to add and run as a scheduled task 
 
 Note: If you read your e-mails in a browser, you need tp download the HTML report to a directory so it will open correctly
 
